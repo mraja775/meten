@@ -40,7 +40,7 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: gradle
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
       - run: chmod +x gradlew
       - run: ./gradlew --no-daemon lintDebug testDebugUnitTest assembleDebug
       - run: METEN_API_BASE_URL=https://api.meten.invalid ./gradlew --no-daemon lintRelease testReleaseUnitTest assembleRelease
