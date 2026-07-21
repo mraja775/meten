@@ -13,7 +13,7 @@ This is the primary bootstrap and handoff document for engineers and coding agen
 - CI workflow: `.github/workflows/ci.yml`
 - Local repository owner identity: `mraja775 <mraja775@users.noreply.github.com>`
 
-`main` is protected. Changes must normally be made on a branch and merged through a pull request. Required status checks are `web` and `android`. One approval, resolved conversations, and linear history are required. Force pushes and branch deletion are disabled, and protections currently apply to administrators.
+`main` is protected for a solo-maintainer workflow. Direct pushes are allowed, while linear history is required and force pushes and branch deletion are disabled. Protections apply to administrators. CI still runs on every push and should be kept green.
 
 The machine may have multiple GitHub accounts configured. Check the active account before GitHub operations:
 
@@ -361,7 +361,7 @@ npm run lint
 npm test
 ```
 
-Use focused branches and conventional-style commit messages. Because `main` is protected, create a pull request and wait for `web` and `android` checks.
+Direct pushes to `main` are allowed for the solo maintainer. Feature branches and pull requests remain optional for larger or experimental changes. Always verify the resulting `web` and `android` CI jobs.
 
 ## Production Configuration Still Required Per Deployment
 
