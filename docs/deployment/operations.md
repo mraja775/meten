@@ -2,6 +2,11 @@
 
 This guide provides the shortest safe paths for local development, Android testing, and Docker-based production deployment. Every script resolves the repository root itself, fails on errors, and prints actionable diagnostics.
 
+For complete step-by-step instructions, use the focused guides:
+
+- [Local development and Android README](../local/README.md)
+- [Cloud deployment README](README-cloud.md)
+
 ## Command summary
 
 | Goal | Command |

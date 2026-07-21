@@ -72,7 +72,10 @@ npm run local:start -- --seed
 npm run android:open
 ```
 
-See the [operations scripts guide](docs/deployment/operations.md) for start, stop, logs, Android installation, and production deployment commands.
+Continue with the focused guide for your environment:
+
+- [Local development and Android README](docs/local/README.md) — first setup, daily scripts, Android Studio, APK installation, database commands, and troubleshooting.
+- [Cloud deployment README](docs/deployment/README-cloud.md) — Linux/Docker deployment, secrets, HTTPS, backups, upgrades, and managed-platform guidance.
 
 The seed creates one academy, two staff users, 100 students, 30 leads and 75 payments. Re-running it safely restores the same demo baseline.
 
@@ -116,6 +119,8 @@ GitHub Actions runs backend type checking, lint, tests and production build, plu
 - [Architecture decisions](docs/architecture/architecture-decisions.md)
 - [Implementation rules](docs/architecture/implementation-rules.md)
 - [Cloud deployment](docs/deployment/cloud-deployment.md)
+- [Local development and scripts](docs/local/README.md)
+- [Production cloud installation](docs/deployment/README-cloud.md)
 - [Operations scripts](docs/deployment/operations.md)
 - [Android release](docs/deployment/android-release.md)
 - [Privacy policy](docs/legal/privacy-policy.md)
