@@ -17,6 +17,7 @@ public/uploads/**
 
 # Android local state and signing material
 consumer-android/.gradle/
+consumer-android/.idea/
 consumer-android/local.properties
 consumer-android/**/build/
 *.jks
