@@ -64,6 +64,16 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). Sign in as `owner@meten.local`; without Resend configured, the development OTP is printed in the server console.
 
+For the simplest managed local workflow:
+
+```bash
+npm run doctor
+npm run local:start -- --seed
+npm run android:open
+```
+
+See the [operations scripts guide](docs/deployment/operations.md) for start, stop, logs, Android installation, and production deployment commands.
+
 The seed creates one academy, two staff users, 100 students, 30 leads and 75 payments. Re-running it safely restores the same demo baseline.
 
 ## Android app
@@ -106,6 +116,7 @@ GitHub Actions runs backend type checking, lint, tests and production build, plu
 - [Architecture decisions](docs/architecture/architecture-decisions.md)
 - [Implementation rules](docs/architecture/implementation-rules.md)
 - [Cloud deployment](docs/deployment/cloud-deployment.md)
+- [Operations scripts](docs/deployment/operations.md)
 - [Android release](docs/deployment/android-release.md)
 - [Privacy policy](docs/legal/privacy-policy.md)
 

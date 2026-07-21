@@ -2,6 +2,8 @@
 
 This runbook prepares Meten for a Docker-based cloud deployment. It is provider-neutral on purpose; use it for Render, Railway, Fly.io, a VPS, AWS ECS, or any container platform that can run a Next.js container and connect to PostgreSQL.
 
+For a Docker host or VPS, prefer the validated `scripts/meten-cloud.sh` workflow documented in [Operations Scripts](operations.md). This runbook remains the provider-neutral architecture reference.
+
 ## Current Deployment Status
 
 Ready:

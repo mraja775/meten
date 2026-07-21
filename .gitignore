@@ -4,9 +4,11 @@ out
 coverage
 playwright-report
 test-results
+.run/
 .env
 .env.local
 .env.production
+.env.production.local
 *.log
 .DS_Store
 tsconfig.tsbuildinfo

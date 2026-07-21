@@ -132,6 +132,19 @@ npm run db:seed
 npm run dev
 ```
 
+The preferred managed commands are:
+
+```bash
+npm run doctor
+npm run local:start -- --seed
+npm run local:status
+npm run local:logs
+npm run local:stop
+npm run android:open
+```
+
+See `docs/deployment/operations.md`. The scripts preserve PostgreSQL data on stop and never seed production automatically.
+
 Open `http://localhost:3000`.
 
 Demo staff login:
