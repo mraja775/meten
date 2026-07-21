@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm-dependencies:
+        patterns: ["*"]
+  - package-ecosystem: gradle
+    directory: /consumer-android
+    schedule:
+      interval: weekly
+    groups:
+      android-dependencies:
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

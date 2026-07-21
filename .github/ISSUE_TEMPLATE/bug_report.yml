@@ -1,0 +1,35 @@
+name: Bug report
+description: Report reproducible incorrect behavior
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide the smallest reliable sequence of steps.
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Version or commit
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, browser/device, Node/Android versions and deployment mode.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: I removed credentials, tokens and personal data from this report.
+          required: true

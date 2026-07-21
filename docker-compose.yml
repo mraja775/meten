@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: meten
+      POSTGRES_USER: meten
+      POSTGRES_PASSWORD: meten
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meten -d meten"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      target: dev
+    command: npm run dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://meten:meten@postgres:5432/meten?schema=public
+      BETTER_AUTH_SECRET: replace-with-a-long-random-secret
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

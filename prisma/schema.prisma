@@ -1,0 +1,401 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  STAFF
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  TRIAL_SCHEDULED
+  TRIAL_COMPLETED
+  JOINED
+  LOST
+}
+
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum MessageType {
+  WHATSAPP
+  SMS
+  EMAIL
+}
+
+enum MessageTemplate {
+  PAYMENT_REMINDER
+  TRIAL_REMINDER
+  ADMISSION_FOLLOW_UP
+  CUSTOM
+}
+
+enum MessageStatus {
+  DRAFT
+  RECORDED
+  SENT
+  FAILED
+}
+
+enum TrainingProcessingStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  UNAVAILABLE
+}
+
+model Academy {
+  id                  String    @id @default(uuid())
+  name                String
+  slug                String    @unique
+  logoUrl             String?
+  address             String?
+  phone               String?
+  email               String?
+  businessHours       String?
+  brandPrimaryColor   String    @default("#111827")
+  brandSecondaryColor String    @default("#64748B")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+  createdBy           String?
+  updatedBy           String?
+
+  users             User[]
+  leads             Lead[]
+  leadActivities    LeadActivity[]
+  students          Student[]
+  studentActivities StudentActivity[]
+  payments          Payment[]
+  messages          Message[]
+  messageRecipients MessageRecipient[]
+  trainingSessions  TrainingSession[]
+  studentAuthOtps   StudentAuthOtp[]
+  studentSessions   StudentSession[]
+
+  @@index([deletedAt])
+}
+
+model User {
+  id        String    @id @default(uuid())
+  academyId String
+  name      String
+  email     String
+  phone     String?
+  role      Role      @default(STAFF)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+
+  academy       Academy       @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  assignedLeads Lead[]        @relation("AssignedLeads")
+  authOtps      AuthOtp[]
+  sessions      UserSession[]
+
+  @@unique([academyId, email])
+  @@index([email, role, deletedAt])
+  @@index([academyId, deletedAt])
+}
+
+model AuthOtp {
+  id         String    @id @default(uuid())
+  userId     String
+  email      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  updatedBy  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, createdAt])
+  @@index([userId, consumedAt, expiresAt])
+}
+
+model UserSession {
+  id         String    @id @default(uuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  lastSeenAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  updatedBy  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, deletedAt, expiresAt])
+}
+
+model Lead {
+  id                 String     @id @default(uuid())
+  academyId          String
+  name               String
+  phone              String
+  email              String?
+  parentName         String?
+  studentAge         Int?
+  source             String?
+  status             LeadStatus @default(NEW)
+  notes              String?
+  followUpDate       DateTime?
+  assignedToId       String?
+  convertedStudentId String?    @unique
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  deletedAt          DateTime?
+  createdBy          String?
+  updatedBy          String?
+
+  academy          Academy            @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  assignedTo       User?              @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+  convertedStudent Student?           @relation("ConvertedLead", fields: [convertedStudentId], references: [id], onDelete: SetNull)
+  activities       LeadActivity[]
+  sourceStudent    Student?           @relation("StudentSourceLead")
+  recipients       MessageRecipient[]
+
+  @@index([academyId, status, deletedAt])
+  @@index([academyId, followUpDate, deletedAt])
+  @@index([academyId, name])
+  @@index([academyId, phone])
+}
+
+model LeadActivity {
+  id          String    @id @default(uuid())
+  academyId   String
+  leadId      String
+  type        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdBy   String?
+  updatedBy   String?
+
+  academy Academy @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  lead    Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([academyId, leadId, deletedAt])
+}
+
+model Student {
+  id           String        @id @default(uuid())
+  academyId    String
+  fullName     String
+  guardianName String?
+  phone        String
+  email        String?
+  joiningDate  DateTime
+  status       StudentStatus @default(ACTIVE)
+  notes        String?
+  sourceLeadId String?       @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  createdBy    String?
+  updatedBy    String?
+
+  academy           Academy            @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  sourceLead        Lead?              @relation("StudentSourceLead", fields: [sourceLeadId], references: [id], onDelete: SetNull)
+  convertedFrom     Lead?              @relation("ConvertedLead")
+  payments          Payment[]
+  activities        StudentActivity[]
+  messageRecipients MessageRecipient[]
+  trainingSessions  TrainingSession[]
+  authOtps          StudentAuthOtp[]
+  sessions          StudentSession[]
+
+  @@index([academyId, status, deletedAt])
+  @@index([academyId, fullName])
+  @@index([academyId, phone])
+}
+
+model StudentAuthOtp {
+  id         String    @id @default(uuid())
+  academyId  String
+  studentId  String
+  email      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  updatedBy  String?
+
+  academy Academy @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([email, createdAt])
+  @@index([studentId, consumedAt, expiresAt])
+}
+
+model StudentSession {
+  id         String    @id @default(uuid())
+  academyId  String
+  studentId  String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  lastSeenAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  updatedBy  String?
+
+  academy Academy @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, deletedAt, expiresAt])
+  @@index([academyId, deletedAt, expiresAt])
+}
+
+model StudentActivity {
+  id          String    @id @default(uuid())
+  academyId   String
+  studentId   String
+  type        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdBy   String?
+  updatedBy   String?
+
+  academy Academy @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([academyId, studentId, deletedAt])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  academyId     String
+  studentId     String
+  amount        Int
+  dueDate       DateTime
+  paidDate      DateTime?
+  status        PaymentStatus @default(PENDING)
+  receiptNumber String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  createdBy     String?
+  updatedBy     String?
+
+  academy Academy @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@index([academyId, status, dueDate, deletedAt])
+  @@index([academyId, studentId, deletedAt])
+}
+
+model Message {
+  id        String          @id @default(uuid())
+  academyId String
+  type      MessageType
+  template  MessageTemplate @default(CUSTOM)
+  subject   String?
+  body      String
+  status    MessageStatus   @default(DRAFT)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+
+  academy    Academy            @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  recipients MessageRecipient[]
+
+  @@index([academyId, status, createdAt, deletedAt])
+}
+
+model MessageRecipient {
+  id            String    @id @default(uuid())
+  academyId     String
+  messageId     String
+  studentId     String?
+  leadId        String?
+  phone         String?
+  email         String?
+  recipientName String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  createdBy     String?
+  updatedBy     String?
+
+  academy Academy  @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  message Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  student Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  lead    Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([academyId, messageId, deletedAt])
+  @@index([academyId, studentId, deletedAt])
+  @@index([academyId, leadId, deletedAt])
+}
+
+model TrainingSession {
+  id                  String                   @id @default(uuid())
+  academyId           String
+  studentId           String
+  sessionDate         DateTime
+  notes               String?
+  reflectionText      String?
+  reflectionInputMode String?
+  imageUrl            String?
+  imagePath           String?
+  imageMimeType       String?
+  imageSizeBytes      Int?
+  imageWidth          Int?
+  imageHeight         Int?
+  originalFileName    String?
+  images              Json?
+  ocrProvider         String?
+  ocrStatus           TrainingProcessingStatus @default(PENDING)
+  ocrText             String?
+  parsedScores        Json?
+  verifiedScores      Json?
+  scoresVerifiedAt    DateTime?
+  bestScore           Float?
+  totalScore          Float?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  deletedAt           DateTime?
+  createdBy           String?
+  updatedBy           String?
+
+  academy Academy @relation(fields: [academyId], references: [id], onDelete: Restrict)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@index([academyId, sessionDate, deletedAt])
+  @@index([academyId, studentId, sessionDate, deletedAt])
+  @@index([academyId, ocrStatus, deletedAt])
+}

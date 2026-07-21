@@ -1,0 +1,23 @@
+node_modules
+.next
+out
+coverage
+playwright-report
+test-results
+.env
+.env.local
+.env.production
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+
+# Runtime uploads are local data, never source code
+public/uploads/**
+!public/uploads/.gitkeep
+
+# Android local state and signing material
+consumer-android/.gradle/
+consumer-android/local.properties
+consumer-android/**/build/
+*.jks
+*.keystore
